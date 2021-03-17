@@ -78,10 +78,12 @@ func writeLoop(
 			go func() {
 				checker.Store(series)
 				// @martinm - better to concatenate the results of series or just loop through the keys?
+				var timeSeries []prompb.TimeSeries
 				for _, s := range series {
-					remoteWrite(s, remotePromClient, remotePromBatchSize,
-						headers, logger)
+					timeSeries = append(timeSeries, s...)
 				}
+				remoteWrite(timeSeries, remotePromClient, remotePromBatchSize,
+					headers, logger)
 				workers <- token
 			}()
 		default:
